@@ -11,15 +11,20 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import org.pxlsim.materials.DynamicMaterial;
+import org.pxlsim.materials.Material;
 import org.pxlsim.materials.SandMaterial;
+import org.pxlsim.util.Coordinates;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 public class App extends Application {
+    final BigDecimal REFRESH_RATE = new BigDecimal("0.02");
     final int WIDTH = 640;
     final int HEIGHT = 360;
-    final Set<SandMaterial> materials = new HashSet<>();
+    final Map<Coordinates, Material> MATERIALS = new HashMap<>();
 
     public static void main(String[] args) {
         launch(args);
@@ -27,7 +32,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        materials.add(new SandMaterial(WIDTH, HEIGHT, 320, 180, Color.BEIGE));
+        MATERIALS.put(new Coordinates(320, 180), new SandMaterial(WIDTH, HEIGHT, 320, 180, Color.BEIGE, REFRESH_RATE));
         StackPane root = new StackPane();
         Canvas canvas = new Canvas(WIDTH, HEIGHT);
         GraphicsContext graphics = canvas.getGraphicsContext2D();
@@ -39,7 +44,7 @@ public class App extends Application {
         stage.setScene(scene);
         stage.setTitle("Test");
         stage.show();
-        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(0.05), e -> {
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(REFRESH_RATE.doubleValue()), e -> {
             handleContent();
             render(graphics);
         }));
@@ -48,17 +53,19 @@ public class App extends Application {
     }
 
     private void handleContent() {
-        for (SandMaterial sand : materials) {
-            sand.move();
+        for (Material mat : MATERIALS.values()) {
+            if (mat instanceof DynamicMaterial) {
+                ((DynamicMaterial) mat).move();
+            }
         }
     }
 
     private void render(GraphicsContext graphics) {
-        graphics.clearRect(0,0,WIDTH,HEIGHT);
+        graphics.clearRect(0, 0, WIDTH, HEIGHT);
         graphics.setFill(Color.BLACK);
         graphics.fillRect(0, 0, WIDTH, HEIGHT);
-        for (SandMaterial sand : materials) {
-            graphics.getPixelWriter().setColor(sand.getX(), sand.getY(), sand.getColor());
+        for (Material mat : MATERIALS.values()) {
+            graphics.getPixelWriter().setColor(mat.getX(), mat.getY(), mat.getColor());
         }
     }
 }
