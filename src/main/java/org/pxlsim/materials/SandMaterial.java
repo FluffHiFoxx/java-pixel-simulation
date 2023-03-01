@@ -1,13 +1,18 @@
 package org.pxlsim.materials;
 
 import javafx.scene.paint.Color;
+import org.pxlsim.Display;
 
-import java.math.BigDecimal;
 import java.util.Random;
 
 public class SandMaterial extends DynamicMaterial {
-    public SandMaterial(int xLimit, int yLimit, int x, int y, BigDecimal refreshRate) {
-        super(xLimit, yLimit, x, y, Color.BEIGE, refreshRate);
+    /**
+     * @param display This parameter ensures that the correct values are extracted from the current working display.
+     * @param x This material's X coordinate.
+     * @param y This material's Y coordinate.
+     */
+    public SandMaterial(Display display, int x, int y) {
+        super(display.getWidth(), display.getHeight(), x, y, Color.BEIGE, display.getRefreshRate());
     }
 
     @Override
