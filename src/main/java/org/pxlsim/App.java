@@ -24,6 +24,8 @@ public class App extends Application {
     final int WIDTH = 640;
     final int HEIGHT = 360;
     final Set<Material> MATERIALS = new HashSet<>();
+    final Set<DynamicMaterial> DYNAMIC_MATERIALS = new HashSet<>();
+    Material[][] board = new Material[HEIGHT][WIDTH];
 
     public static void main(String[] args) {
         launch(args);
@@ -31,7 +33,6 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        MATERIALS.add(new SandMaterial(WIDTH, HEIGHT, 320, 180, Color.BEIGE, REFRESH_RATE));
         StackPane root = new StackPane();
         Canvas canvas = new Canvas(WIDTH, HEIGHT);
         GraphicsContext graphics = canvas.getGraphicsContext2D();
@@ -43,6 +44,7 @@ public class App extends Application {
         stage.setScene(scene);
         stage.setTitle("Test");
         stage.show();
+        fillFields();
         Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(REFRESH_RATE.doubleValue()), e -> {
             handleContent();
             render(graphics);
@@ -51,11 +53,19 @@ public class App extends Application {
         timeline.playFromStart();
     }
 
-    private void handleContent() {
+    private void fillFields() {
+        DYNAMIC_MATERIALS.add(new SandMaterial(WIDTH, HEIGHT, 320, 0, REFRESH_RATE));
+        DYNAMIC_MATERIALS.add(new SandMaterial(WIDTH, HEIGHT, 320, 20, REFRESH_RATE));
+        DYNAMIC_MATERIALS.add(new SandMaterial(WIDTH, HEIGHT, 320, 40, REFRESH_RATE));
+        MATERIALS.addAll(DYNAMIC_MATERIALS);
         for (Material mat : MATERIALS) {
-            if (mat instanceof DynamicMaterial) {
-                ((DynamicMaterial) mat).move();
-            }
+            board[mat.getY()][mat.getX()] = mat;
+        }
+    }
+
+    private void handleContent() {
+        for (DynamicMaterial mat : DYNAMIC_MATERIALS) {
+                mat.move(board);
         }
     }
 
