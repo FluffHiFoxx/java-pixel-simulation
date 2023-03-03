@@ -12,7 +12,7 @@ public class SandMaterial extends DynamicMaterial {
      * @param y This material's Y coordinate.
      */
     public SandMaterial(Display display, int x, int y) {
-        super(display.getWidth(), display.getHeight(), x, y, Color.BEIGE, display.getRefreshRate());
+        super(display, x, y, Color.BEIGE, display.getRefreshRate());
     }
 
     @Override

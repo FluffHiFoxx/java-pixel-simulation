@@ -1,15 +1,16 @@
 package org.pxlsim.materials;
 
 import javafx.scene.paint.Color;
+import org.pxlsim.Display;
 
 public abstract class Material {
     int xLimit, yLimit;
     int x, y;
     final Color COLOR;
 
-    public Material(int xLimit, int yLimit, int x, int y, Color color) {
-        this.xLimit = xLimit - 1;
-        this.yLimit = yLimit - 1;
+    public Material(Display display, int x, int y, Color color) {
+        this.xLimit = display.getWidth() - 1;
+        this.yLimit = display.getHeight() - 1;
         this.x = Math.min(x, this.xLimit);
         this.y = Math.min(y, this.yLimit);
         this.COLOR = color;
