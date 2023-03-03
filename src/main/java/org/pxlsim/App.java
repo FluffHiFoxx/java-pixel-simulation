@@ -6,12 +6,14 @@ import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.pxlsim.materials.DynamicMaterial;
 import org.pxlsim.materials.Material;
+import org.pxlsim.materials.Platform;
 import org.pxlsim.materials.SandMaterial;
 
 import java.util.HashSet;
@@ -24,12 +26,22 @@ public class App extends Application {
     private final Set<Material> MATERIALS = new HashSet<>();
     private final Set<DynamicMaterial> DYNAMIC_MATERIALS = new HashSet<>();
     private final Material[][] BOARD = new Material[HEIGHT][WIDTH];
-    private final EventHandler<MouseEvent> CREATE = new EventHandler<>() {
+    final EventHandler<MouseEvent> CREATE = new EventHandler<>() {
         @Override
         public void handle(MouseEvent mouseEvent) {
-            SandMaterial e = new SandMaterial(display, (int) Math.round(mouseEvent.getSceneX()), (int) Math.round(mouseEvent.getSceneY()));
-            DYNAMIC_MATERIALS.add(e);
-            MATERIALS.add(e);
+            int x = (int) Math.round(mouseEvent.getSceneX());
+            int y = (int) Math.round(mouseEvent.getSceneY());
+            if (BOARD[y][x] == null) {
+                if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
+                    SandMaterial e = new SandMaterial(display, x, y);
+                    DYNAMIC_MATERIALS.add(e);
+                    MATERIALS.add(e);
+                } else if (mouseEvent.getButton().equals(MouseButton.SECONDARY)) {
+                    Platform e = new Platform(display, x, y, Color.AQUAMARINE);
+                    MATERIALS.add(e);
+                    BOARD[e.getY()][e.getX()] = e;
+                }
+            }
         }
     };
 
@@ -40,6 +52,7 @@ public class App extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         this.display = new Display(WIDTH, HEIGHT, 0.02);
+        display.getScene().addEventFilter(MouseEvent.MOUSE_PRESSED, CREATE);
         stage.setResizable(false);
         stage.centerOnScreen();
         stage.setScene(display.getScene());
@@ -47,7 +60,6 @@ public class App extends Application {
         stage.show();
 //        fillFields();
         render();
-        display.getScene().addEventFilter(MouseEvent.MOUSE_CLICKED, CREATE);
         Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(display.getRefreshRate().doubleValue()), e -> {
             handleContent();
             render();
