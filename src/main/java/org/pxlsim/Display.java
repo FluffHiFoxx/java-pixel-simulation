@@ -30,7 +30,7 @@ public class Display {
                 .min(new BigDecimal("1"))
                 .max(new BigDecimal("0.02"));
         this.STACK_PANE = new StackPane();
-        this.CANVAS = new Canvas(width, height);
+        this.CANVAS = new Canvas(this.WIDTH, this.HEIGHT);
         this.GRAPHICS = this.CANVAS.getGraphicsContext2D();
         this.SCENE = new Scene(this.STACK_PANE, this.WIDTH, this.HEIGHT);
         this.STACK_PANE.getChildren().add(this.CANVAS);
