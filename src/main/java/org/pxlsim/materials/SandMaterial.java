@@ -8,8 +8,8 @@ import java.util.Random;
 public class SandMaterial extends DynamicMaterial {
     /**
      * @param display This parameter ensures that the correct values are extracted from the current working display.
-     * @param x This material's X coordinate.
-     * @param y This material's Y coordinate.
+     * @param x       This material's X coordinate.
+     * @param y       This material's Y coordinate.
      */
     public SandMaterial(Display display, int x, int y) {
         super(display, x, y, Color.BEIGE, display.getRefreshRate());
@@ -22,10 +22,10 @@ public class SandMaterial extends DynamicMaterial {
         board[this.y][this.x] = null;
         for (int i = this.y; i <= nextY; i++) {
             if (board[i][this.x] != null) {
-                if (board[i][this.x + xModifier] == null) {
+                if (board[i][this.x + xModifier] == null && board[this.y][this.x + xModifier] == null) {
                     this.y = i;
                     this.x = this.x + xModifier;
-                } else if (board[i][this.x - xModifier] == null) {
+                } else if (board[i][this.x - xModifier] == null && board[this.y][this.x - xModifier] == null) {
                     this.y = i;
                     this.x = this.x - xModifier;
                 } else {
