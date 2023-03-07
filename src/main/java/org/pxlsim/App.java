@@ -29,7 +29,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        new Mouse(DISPLAY, BOARD, MATERIALS, DYNAMIC_MATERIALS);
+        new MaterialCreator(DISPLAY, BOARD, MATERIALS, DYNAMIC_MATERIALS);
         stage.setResizable(false);
         stage.centerOnScreen();
         stage.setScene(DISPLAY.getScene());
