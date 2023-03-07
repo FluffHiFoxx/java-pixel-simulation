@@ -17,18 +17,18 @@ public class Display {
     private final Scene SCENE;
 
     /**
-     * @param refreshRate This needs to be a value between 1 and 0.02
+     * @param refreshRate This needs to be a value between 1 and 60 frames per second
      *                    these are the tested refresh rates that still work as intended.
      *                    The given value is validated so there is no chance to give a bad parameter.
      * @param width This value supposed to match the exact width of the board you are working on.
      * @param height This value supposed to match the exact height of the board you are working on.
      */
-    public Display(int width, int height, double refreshRate) {
+    public Display(int width, int height, int refreshRate) {
         this.WIDTH = width;
         this.HEIGHT = height;
-        this.REFRESH_RATE = new BigDecimal(String.valueOf(refreshRate))
+        this.REFRESH_RATE = new BigDecimal(String.valueOf(1 / refreshRate))
                 .min(new BigDecimal("1"))
-                .max(new BigDecimal("0.02"));
+                .max(new BigDecimal("0.016"));
         this.STACK_PANE = new StackPane();
         this.CANVAS = new Canvas(this.WIDTH, this.HEIGHT);
         this.GRAPHICS = this.CANVAS.getGraphicsContext2D();
