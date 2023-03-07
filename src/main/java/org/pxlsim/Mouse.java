@@ -8,10 +8,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
-import org.pxlsim.materials.DynamicMaterial;
-import org.pxlsim.materials.Material;
-import org.pxlsim.materials.Platform;
-import org.pxlsim.materials.SandMaterial;
+import org.pxlsim.materials.*;
 
 import java.util.Set;
 
@@ -45,6 +42,7 @@ public class Mouse {
             if (BOARD[y][x] == null) {
                 if (button.equals(MouseButton.PRIMARY)) {
                     SandMaterial material = new SandMaterial(DISPLAY, x, y);
+//                    WaterMaterial material = new WaterMaterial(DISPLAY, x, y);
                     DYNAMIC_MATERIALS.add(material);
                     MATERIALS.add(material);
                 } else if (button.equals(MouseButton.SECONDARY)) {
