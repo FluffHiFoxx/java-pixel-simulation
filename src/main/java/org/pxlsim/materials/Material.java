@@ -4,9 +4,9 @@ import javafx.scene.paint.Color;
 import org.pxlsim.Display;
 
 public abstract class Material {
-    int xLimit, yLimit;
-    int x, y;
-    final Color COLOR;
+    private final int xLimit, yLimit;
+    private int x, y;
+    private final Color COLOR;
 
     public Material(Display display, int x, int y, Color color) {
         this.xLimit = display.getWidth() - 1;
@@ -26,5 +26,21 @@ public abstract class Material {
 
     public Color getColor() {
         return COLOR;
+    }
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public void setY(int y) {
+        this.y = y;
+    }
+
+    public int getXLimit() {
+        return xLimit;
+    }
+
+    public int getYLimit() {
+        return yLimit;
     }
 }
