@@ -18,7 +18,7 @@ import java.util.Set;
 public class App extends Application {
     private final int WIDTH = 640;
     private final int HEIGHT = 360;
-    private final Display DISPLAY = new Display(WIDTH, HEIGHT, 60);
+    private final Display DISPLAY = new Display(WIDTH, HEIGHT, 60, 2.5);
     private final Set<Material> MATERIALS = new HashSet<>();
     private final Set<DynamicMaterial> DYNAMIC_MATERIALS = new HashSet<>();
     private final Material[][] BOARD = new Material[HEIGHT][WIDTH];

@@ -43,8 +43,8 @@ public class MaterialCreator {
 
     private Timeline createTimeline() {
         return new Timeline(new KeyFrame(Duration.seconds(DISPLAY.getRefreshRate().doubleValue()), e -> {
-            int x = (int) Math.round(mouseX);
-            int y = (int) Math.round(mouseY);
+            int x = (int) Math.round((mouseX / DISPLAY.getZoom().doubleValue()));
+            int y = (int) Math.round((mouseY / DISPLAY.getZoom().doubleValue()));
             if (BOARD[y][x] == null) {
                 if (button.equals(MouseButton.PRIMARY)) {
                     DynamicMaterial material = switch (materialIndex) {
