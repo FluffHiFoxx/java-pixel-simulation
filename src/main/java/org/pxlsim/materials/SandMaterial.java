@@ -17,25 +17,43 @@ public class SandMaterial extends DynamicMaterial {
 
     @Override
     public void move(Material[][] board) {
-        int nextY = this.y + Math.min(this.yLimit - this.y, this.FALL_SPEED);
+        int nextY = this.getY() + Math.min(this.getYLimit() - this.getY(), this.FALL_SPEED);
         int xModifier = new Random().nextBoolean() ? 1 : -1;
-        board[this.y][this.x] = null;
-        for (int i = this.y; i <= nextY; i++) {
-            if (board[i][this.x] != null) {
-                if (board[i][this.x + xModifier] == null && board[this.y][this.x + xModifier] == null) {
-                    this.y = i;
-                    this.x = this.x + xModifier;
-                } else if (board[i][this.x - xModifier] == null && board[this.y][this.x - xModifier] == null) {
-                    this.y = i;
-                    this.x = this.x - xModifier;
+        board[this.getY()][this.getX()] = null;
+        for (int i = this.getY(); i <= nextY; i++) {
+            if (board[i][this.getX()] != null) {
+                if (board[i][this.getX() + xModifier] == null
+                        && board[this.getY()][this.getX() + xModifier] == null
+                        && isInBoundsX(this.getX() + xModifier)) {
+                    if (board[i][this.getX() + xModifier] instanceof WaterMaterial water) {
+                        water.setY(i + 1);
+                        board[water.getY()][water.getX()] = water;
+                    }
+                    setY(i);
+                    setX(this.getX() + xModifier);
+                } else if (board[i][this.getX() - xModifier] == null
+                        && board[this.getY()][this.getX() - xModifier] == null
+                        && isInBoundsX(this.getX() - xModifier)) {
+                    if (board[i][this.getX() - xModifier] instanceof WaterMaterial water) {
+                        water.setY(i + 1);
+                        board[water.getY()][water.getX()] = water;
+                    }
+                    setY(i);
+                    setX(this.getX() - xModifier);
                 } else {
-                    this.y = i - 1;
+                    if (board[i][this.getX()] instanceof WaterMaterial water) {
+                        water.setY(i - 1);
+                        setY(i);
+                        board[water.getY()][water.getX()] = water;
+                    } else {
+                        setY(i - 1);
+                    }
                 }
-                board[this.y][this.x] = this;
+                board[this.getY()][this.getX()] = this;
                 return;
             }
         }
-        this.y = nextY;
-        board[this.y][this.x] = this;
+        setY(nextY);
+        board[this.getY()][this.getX()] = this;
     }
 }

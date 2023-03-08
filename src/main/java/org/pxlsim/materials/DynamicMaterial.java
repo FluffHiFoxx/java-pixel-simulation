@@ -16,4 +16,7 @@ public abstract class DynamicMaterial extends Material {
     }
 
     public abstract void move(Material[][] board);
+    public boolean isInBoundsX(int value) {
+        return value > 0 && value < this.getXLimit();
+    }
 }
