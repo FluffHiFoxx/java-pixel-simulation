@@ -31,7 +31,7 @@ public class MaterialCreator {
         this.MATERIALS = materials;
         this.DYNAMIC_MATERIALS = dynamicMaterials;
         this.TIMELINE = createTimeline();
-        this.materialIndex = 0;
+        this.materialIndex = 1;
         EventHandler<MouseEvent> CREATE = createMouseEventHandler();
         EventHandler<KeyEvent> CHANGE = createKeyEventHandler();
         this.DISPLAY.getScene().addEventFilter(MouseEvent.MOUSE_PRESSED, CREATE);
@@ -43,9 +43,25 @@ public class MaterialCreator {
 
     private Timeline createTimeline() {
         return new Timeline(new KeyFrame(Duration.seconds(DISPLAY.getRefreshRate().doubleValue()), e -> {
-            int x = (int) Math.round((mouseX / DISPLAY.getZoom().doubleValue()));
             int y = (int) Math.round((mouseY / DISPLAY.getZoom().doubleValue()));
-            if (BOARD[y][x] == null) {
+            int x = (int) Math.round((mouseX / DISPLAY.getZoom().doubleValue()));
+            Material cell;
+            try {
+                cell = BOARD[y][x];
+            } catch (ArrayIndexOutOfBoundsException exception) {
+                if (y >= BOARD.length) {
+                    y = BOARD.length - 1;
+                } else if (y < 0) {
+                    y = 0;
+                }
+                if (x >= BOARD[y].length) {
+                    x = BOARD[y].length - 1;
+                } else if (x < 0) {
+                    x = 0;
+                }
+                cell = BOARD[y][x];
+            }
+            if (cell == null) {
                 if (button.equals(MouseButton.PRIMARY)) {
                     Material material = switch (materialIndex) {
                         case 0 -> {

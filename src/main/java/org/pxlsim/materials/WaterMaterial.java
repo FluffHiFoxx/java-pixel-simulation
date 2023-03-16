@@ -19,25 +19,18 @@ public class WaterMaterial extends DynamicMaterial {
     public void move(Material[][] board) {
         int nextY = this.getY() + Math.min(this.getYLimit() - this.getY(), this.FALL_SPEED);
         int xModifier = new Random().nextBoolean() ? 1 : -1;
+        int nextX = isInBoundsX(this.getX() + xModifier) ? this.getX() + xModifier
+                : isInBoundsX(this.getX() - xModifier) ? this.getX() - xModifier
+                : this.getX();
         board[this.getY()][this.getX()] = null;
         for (int i = this.getY(); i <= nextY; i++) {
             if (board[i][this.getX()] != null) {
-                if (board[i][this.getX() + xModifier] == null
-                        && board[this.getY()][this.getX() + xModifier] == null
-                        && isInBoundsX(this.getX() + xModifier)) {
+                if (board[i][nextX] == null
+                        && board[this.getY()][nextX] == null) {
                     setY(i);
-                    setX(this.getX() + xModifier);
-                } else if (board[i][this.getX() - xModifier] == null
-                        && board[this.getY()][this.getX() - xModifier] == null
-                        && isInBoundsX(this.getX() - xModifier)) {
-                    setY(i);
-                    setX(this.getX() - xModifier);
-                } else if (board[this.getY()][this.getX() + xModifier] == null
-                        && isInBoundsX(this.getX() + xModifier)) {
-                    setX(this.getX() + xModifier);
-                } else if (board[this.getY()][this.getX() - xModifier] == null
-                        && isInBoundsX(this.getX() - xModifier)) {
-                    setX(this.getX() - xModifier);
+                    setX(nextX);
+                } else if (board[this.getY()][nextX] == null) {
+                    setX(nextX);
                 } else {
                     setY(i - 1);
                 }
@@ -46,6 +39,9 @@ public class WaterMaterial extends DynamicMaterial {
             }
         }
         setY(nextY);
+        if (board[this.getY()][nextX] == null && this.getY() == this.getYLimit()) {
+            setX(nextX);
+        }
         board[this.getY()][this.getX()] = this;
     }
 }

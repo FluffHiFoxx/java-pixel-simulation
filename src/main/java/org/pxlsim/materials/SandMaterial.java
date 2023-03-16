@@ -19,27 +19,20 @@ public class SandMaterial extends DynamicMaterial {
     public void move(Material[][] board) {
         int nextY = this.getY() + Math.min(this.getYLimit() - this.getY(), this.FALL_SPEED);
         int xModifier = new Random().nextBoolean() ? 1 : -1;
+        int nextX = isInBoundsX(this.getX() + xModifier) ? this.getX() + xModifier
+                : isInBoundsX(this.getX() - xModifier) ? this.getX() - xModifier
+                : this.getX();
         board[this.getY()][this.getX()] = null;
         for (int i = this.getY(); i <= nextY; i++) {
             if (board[i][this.getX()] != null) {
-                if (board[i][this.getX() + xModifier] == null
-                        && board[this.getY()][this.getX() + xModifier] == null
-                        && isInBoundsX(this.getX() + xModifier)) {
-                    if (board[i][this.getX() + xModifier] instanceof WaterMaterial water) {
+                if (board[i][nextX] == null
+                        && board[this.getY()][nextX] == null) {
+                    if (board[i][nextX] instanceof WaterMaterial water) {
                         water.setY(i + 1);
                         board[water.getY()][water.getX()] = water;
                     }
                     setY(i);
-                    setX(this.getX() + xModifier);
-                } else if (board[i][this.getX() - xModifier] == null
-                        && board[this.getY()][this.getX() - xModifier] == null
-                        && isInBoundsX(this.getX() - xModifier)) {
-                    if (board[i][this.getX() - xModifier] instanceof WaterMaterial water) {
-                        water.setY(i + 1);
-                        board[water.getY()][water.getX()] = water;
-                    }
-                    setY(i);
-                    setX(this.getX() - xModifier);
+                    setX(nextX);
                 } else {
                     if (board[i][this.getX()] instanceof WaterMaterial water) {
                         water.setY(i - 1);
