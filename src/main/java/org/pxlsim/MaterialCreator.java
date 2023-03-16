@@ -47,18 +47,27 @@ public class MaterialCreator {
             int y = (int) Math.round((mouseY / DISPLAY.getZoom().doubleValue()));
             if (BOARD[y][x] == null) {
                 if (button.equals(MouseButton.PRIMARY)) {
-                    DynamicMaterial material = switch (materialIndex) {
-                        case 0 -> new SandMaterial(DISPLAY, x, y);
-                        case 1 -> new WaterMaterial(DISPLAY, x, y);
+                    Material material = switch (materialIndex) {
+                        case 0 -> {
+                            Platform platform = new Platform(DISPLAY, x, y, Color.GRAY);
+                            BOARD[platform.getY()][platform.getX()] = platform;
+                            yield platform;
+                        }
+                        case 1 -> new SandMaterial(DISPLAY, x, y);
+                        case 2 -> new WaterMaterial(DISPLAY, x, y);
                         default -> throw new IllegalStateException("Unexpected value: " + materialIndex);
                     };
-                    DYNAMIC_MATERIALS.add(material);
+                    if (material instanceof DynamicMaterial) {
+                        DYNAMIC_MATERIALS.add((DynamicMaterial) material);
+                    }
                     MATERIALS.add(material);
-                } else if (button.equals(MouseButton.SECONDARY)) {
-                    Platform platform = new Platform(DISPLAY, x, y, Color.GRAY);
-                    MATERIALS.add(platform);
-                    BOARD[platform.getY()][platform.getX()] = platform;
                 }
+            } else if (button.equals(MouseButton.SECONDARY)) {
+                MATERIALS.remove(cell);
+                if (cell instanceof DynamicMaterial) {
+                    DYNAMIC_MATERIALS.remove(cell);
+                }
+                BOARD[y][x] = null;
             }
         }));
     }
@@ -83,10 +92,10 @@ public class MaterialCreator {
 
     private EventHandler<KeyEvent> createKeyEventHandler() {
         return keyEvent -> {
-            if (keyEvent.getCharacter().equals("1")) {
-                materialIndex = 0;
-            } else if (keyEvent.getCharacter().equals("2")) {
-                materialIndex = 1;
+            switch (keyEvent.getCharacter()) {
+                case "1" -> materialIndex = 0;
+                case "2" -> materialIndex = 1;
+                case "3" -> materialIndex = 2;
             }
         };
     }
