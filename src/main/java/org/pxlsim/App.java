@@ -38,7 +38,9 @@ public class App extends Application {
 //        fillFields();
         render();
         Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(DISPLAY.getRefreshRate().doubleValue()), e -> {
-            handleContent();
+            if (!DYNAMIC_MATERIALS.isEmpty()) {
+                handleContent();
+            }
             render();
         }));
         timeline.setCycleCount(Animation.INDEFINITE);
