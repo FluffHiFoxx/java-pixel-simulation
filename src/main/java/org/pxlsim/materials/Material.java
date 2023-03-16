@@ -3,12 +3,16 @@ package org.pxlsim.materials;
 import javafx.scene.paint.Color;
 import org.pxlsim.Display;
 
+import java.util.UUID;
+
 public abstract class Material {
+    private final UUID id;
     private final int xLimit, yLimit;
     private int x, y;
     private final Color COLOR;
 
     public Material(Display display, int x, int y, Color color) {
+        this.id = UUID.randomUUID();
         this.xLimit = display.getWidth() - 1;
         this.yLimit = display.getHeight() - 1;
         this.x = Math.min(x, this.xLimit);
@@ -42,5 +46,10 @@ public abstract class Material {
 
     public int getYLimit() {
         return yLimit;
+    }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + "{" + id + "}";
     }
 }
