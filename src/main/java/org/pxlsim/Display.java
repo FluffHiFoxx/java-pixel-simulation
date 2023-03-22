@@ -30,7 +30,7 @@ public class Display {
         this.WIDTH = width;
         this.HEIGHT = height;
         this.ZOOM = BigDecimal.valueOf(Math.abs(zoom));
-        this.REFRESH_RATE = new BigDecimal(String.valueOf(1 / refreshRate))
+        this.REFRESH_RATE = new BigDecimal(String.valueOf((double) 1 / refreshRate))
                 .min(new BigDecimal("1"))
                 .max(new BigDecimal("0.016"));
         this.STACK_PANE = new StackPane();
