@@ -40,9 +40,7 @@ public class Display {
         this.STACK_PANE = new StackPane();
         this.CANVAS = new Canvas(this.WIDTH, this.HEIGHT);
         this.GRAPHICS = this.CANVAS.getGraphicsContext2D();
-        this.SCENE = new Scene(this.STACK_PANE,
-                this.WIDTH * ZOOM.doubleValue(),
-                this.HEIGHT * ZOOM.doubleValue());
+        this.SCENE = new Scene(this.STACK_PANE, this.WINDOW_WIDTH, this.WINDOW_HEIGHT);
         GRAPHICS.setImageSmoothing(false);
         CANVAS.setScaleY(ZOOM.doubleValue());
         CANVAS.setScaleX(ZOOM.doubleValue());
