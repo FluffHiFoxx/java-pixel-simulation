@@ -11,7 +11,6 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.pxlsim.materials.DynamicMaterial;
 import org.pxlsim.materials.Material;
-import org.pxlsim.materials.SandMaterial;
 
 import java.util.HashSet;
 import java.util.Set;
