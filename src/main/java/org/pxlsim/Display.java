@@ -16,6 +16,8 @@ public class Display {
     private final GraphicsContext GRAPHICS;
     private final Scene SCENE;
     private final BigDecimal ZOOM;
+    private final int WINDOW_WIDTH;
+    private final int WINDOW_HEIGHT;
 
     /**
      * @param zoom        If the pixel size is small this will scale everything accordingly.
@@ -30,6 +32,8 @@ public class Display {
         this.WIDTH = width;
         this.HEIGHT = height;
         this.ZOOM = BigDecimal.valueOf(Math.abs(zoom));
+        this.WINDOW_WIDTH = getZoom().multiply(new BigDecimal(getWidth())).intValue();
+        this.WINDOW_HEIGHT = getZoom().multiply(new BigDecimal(getHeight())).intValue();
         this.REFRESH_RATE = new BigDecimal(String.valueOf((double) 1 / refreshRate))
                 .min(new BigDecimal("1"))
                 .max(new BigDecimal("0.016"));
@@ -56,6 +60,8 @@ public class Display {
         this.WIDTH = width;
         this.HEIGHT = height;
         this.ZOOM = new BigDecimal(1);
+        this.WINDOW_WIDTH = getZoom().multiply(new BigDecimal(getWidth())).intValue();
+        this.WINDOW_HEIGHT = getZoom().multiply(new BigDecimal(getHeight())).intValue();
         this.REFRESH_RATE = new BigDecimal(String.valueOf(1 / refreshRate))
                 .min(new BigDecimal("1"))
                 .max(new BigDecimal("0.016"));
@@ -101,5 +107,13 @@ public class Display {
 
     public BigDecimal getZoom() {
         return ZOOM;
+    }
+
+    public int getWindowWidth() {
+        return WINDOW_WIDTH;
+    }
+
+    public int getWindowHeight() {
+        return WINDOW_HEIGHT;
     }
 }

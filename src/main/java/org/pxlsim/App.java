@@ -6,6 +6,7 @@ import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.pxlsim.materials.DynamicMaterial;
@@ -18,7 +19,7 @@ import java.util.Set;
 public class App extends Application {
     private final int WIDTH = 640;
     private final int HEIGHT = 360;
-    private final Display DISPLAY = new Display(WIDTH, HEIGHT, 60, 2.5);
+    private final Display DISPLAY = new Display(WIDTH, HEIGHT, 60, 3);
     private final Set<Material> MATERIALS = new HashSet<>();
     private final Set<DynamicMaterial> DYNAMIC_MATERIALS = new HashSet<>();
     private final Material[][] BOARD = new Material[HEIGHT][WIDTH];
@@ -35,7 +36,10 @@ public class App extends Application {
         stage.setScene(DISPLAY.getScene());
         stage.setTitle("Test");
         stage.show();
-//        fillFields();
+        if (Screen.getPrimary().getOutputScaleX() == DISPLAY.getWindowWidth()
+                && Screen.getPrimary().getOutputScaleY() == DISPLAY.getWindowHeight()) {
+            stage.setFullScreen(true);
+        }
         render();
         Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(DISPLAY.getRefreshRate().doubleValue()), e -> {
             if (!DYNAMIC_MATERIALS.isEmpty()) {
@@ -45,19 +49,6 @@ public class App extends Application {
         }));
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.playFromStart();
-    }
-
-    /**
-     * Pre-fills the board and its fields with some materials for testing
-     */
-    private void fillFields() {
-        DYNAMIC_MATERIALS.add(new SandMaterial(DISPLAY, 320, 0));
-        DYNAMIC_MATERIALS.add(new SandMaterial(DISPLAY, 320, 20));
-        DYNAMIC_MATERIALS.add(new SandMaterial(DISPLAY, 320, 40));
-        MATERIALS.addAll(DYNAMIC_MATERIALS);
-        for (Material mat : MATERIALS) {
-            BOARD[mat.getY()][mat.getX()] = mat;
-        }
     }
 
     private void handleContent() {
