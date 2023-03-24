@@ -23,15 +23,7 @@ public class WaterMaterial extends DynamicMaterial {
                 : isInBoundsX(this.getX() - xModifier) ? this.getX() - xModifier
                 : this.getX();
         board[this.getY()][this.getX()] = null;
-        if (board[Math.max(this.getY() - 1, 0)][this.getX()] instanceof WaterMaterial waterMaterial) {
-            Color colorAbove = waterMaterial.getColor();
-            double r = colorAbove.getRed() - 0.1 >= 0 ? colorAbove.getRed() - 0.1 : 0;
-            double g = colorAbove.getGreen() - 0.1 >= 0 ? colorAbove.getGreen() - 0.1 : 0;
-            double b = colorAbove.getGreen() == 0 && colorAbove.getRed() == 0 && colorAbove.getBlue() > 0.2 ? colorAbove.getBlue() - 0.1 : colorAbove.getBlue();
-            this.setColor(Color.color(r, g, b));
-        } else if (!this.getColor().equals(Color.DEEPSKYBLUE)) {
-            this.setColor(Color.DEEPSKYBLUE);
-        }
+        changeColor(board);
         for (int i = this.getY(); i <= nextY; i++) {
             if (board[i][this.getX()] != null) {
                 if (board[i][nextX] == null
@@ -52,5 +44,16 @@ public class WaterMaterial extends DynamicMaterial {
             setX(nextX);
         }
         board[this.getY()][this.getX()] = this;
+    }
+    private void changeColor(Material[][] board) {
+        if (board[Math.max(this.getY() - 1, 0)][this.getX()] instanceof WaterMaterial waterMaterial) {
+            Color colorAbove = waterMaterial.getColor();
+            double r = colorAbove.getRed() - 0.1 >= 0 ? colorAbove.getRed() - 0.1 : 0;
+            double g = colorAbove.getGreen() - 0.1 >= 0 ? colorAbove.getGreen() - 0.1 : 0;
+            double b = colorAbove.getGreen() == 0 && colorAbove.getRed() == 0 && colorAbove.getBlue() > 0.4 ? colorAbove.getBlue() - 0.1 : colorAbove.getBlue();
+            this.setColor(Color.color(r, g, b));
+        } else if (!this.getColor().equals(Color.DEEPSKYBLUE)) {
+            this.setColor(Color.DEEPSKYBLUE);
+        }
     }
 }
