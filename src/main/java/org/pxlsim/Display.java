@@ -38,12 +38,13 @@ public class Display {
                 .min(new BigDecimal("1"))
                 .max(new BigDecimal("0.016"));
         this.STACK_PANE = new StackPane();
-        this.CANVAS = new Canvas(this.WIDTH, this.HEIGHT);
+        this.CANVAS = new Canvas(this.WINDOW_WIDTH, this.WINDOW_HEIGHT);
+//        this.CANVAS = new Canvas(this.WIDTH, this.HEIGHT);                               [ONLY: Old-rendering method]
         this.GRAPHICS = this.CANVAS.getGraphicsContext2D();
         this.SCENE = new Scene(this.STACK_PANE, this.WINDOW_WIDTH, this.WINDOW_HEIGHT);
         GRAPHICS.setImageSmoothing(false);
-        CANVAS.setScaleY(ZOOM.doubleValue());
-        CANVAS.setScaleX(ZOOM.doubleValue());
+//        CANVAS.setScaleY(ZOOM.doubleValue());                                            [ONLY: Old-rendering method]
+//        CANVAS.setScaleX(ZOOM.doubleValue());                                            [ONLY: Old-rendering method]
         STACK_PANE.getChildren().add(this.CANVAS);
     }
 
