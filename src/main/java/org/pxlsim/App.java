@@ -5,6 +5,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
@@ -39,7 +40,7 @@ import java.util.Set;
  * </table>
  */
 public class App extends Application {
-    private final String VERSION = "V.0.21"; // <- V.[Major Release].[Major Addition][Change in the current Addition]
+    private final String VERSION = "V.0.22"; // <- V.[Major Release].[Major Addition][Change in the current Addition]
     private final int WIDTH = 256;
     private final int HEIGHT = 144;
     private final int ZOOM = 6;
@@ -62,7 +63,12 @@ public class App extends Application {
         stage.setResizable(false);
         stage.centerOnScreen();
         TilePane root = new TilePane();
+        root.setTileAlignment(Pos.CENTER);
+        root.setAlignment(Pos.CENTER);
+        root.setVgap(10);
         Button startButton = new Button("Start");
+        startButton.setScaleX(2);
+        startButton.setScaleY(2);
         Button defaultButton = new Button("Default");
         TextField width = new TextField(String.valueOf(this.WIDTH));
         width.textProperty().addListener(getNumberListener(width));
@@ -90,7 +96,7 @@ public class App extends Application {
             height.setText(String.valueOf(this.HEIGHT));
             zoom.setText(String.valueOf(this.ZOOM));
         });
-        Scene scene = new Scene(root, 256, 256);
+        Scene scene = new Scene(root, 256, 384);
         stage.setScene(scene);
         stage.setTitle("Menu - " + VERSION);
         stage.show();
