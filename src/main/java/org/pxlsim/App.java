@@ -39,7 +39,7 @@ import java.util.Set;
  * </table>
  */
 public class App extends Application {
-    private final String VERSION = "V.0.20"; // <- V.[Major Release].[Major Addition][Change in the current Addition]
+    private final String VERSION = "V.0.21"; // <- V.[Major Release].[Major Addition][Change in the current Addition]
     private final int WIDTH = 256;
     private final int HEIGHT = 144;
     private final int ZOOM = 6;

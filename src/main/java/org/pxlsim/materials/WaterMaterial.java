@@ -6,6 +6,8 @@ import org.pxlsim.Display;
 import java.util.Random;
 
 public class WaterMaterial extends DynamicMaterial {
+    private int flowDirection = new Random().nextBoolean() ? 1 : -1;
+
     /**
      * @param display This parameter ensures that the correct values are extracted from the current working display.
      * @param x       This material's X coordinate.
@@ -17,10 +19,14 @@ public class WaterMaterial extends DynamicMaterial {
 
     @Override
     public void move(Material[][] board) {
-        int nextY = this.getY() + Math.min(this.getYLimit() - this.getY(), this.FALL_SPEED);
+/* // [Old Liquid flow] - TO GO BACK TO THIS METHOD REMOVE FLOW DIRECTION
         int xModifier = new Random().nextBoolean() ? 1 : -1;
         int nextX = isInBoundsX(this.getX() + xModifier) ? this.getX() + xModifier
                 : isInBoundsX(this.getX() - xModifier) ? this.getX() - xModifier
+*/
+        int nextY = this.getY() + Math.min(this.getYLimit() - this.getY(), this.FALL_SPEED);
+        int nextX = isInBoundsX(this.getX() + flowDirection) ? this.getX() + flowDirection
+                : isInBoundsX(this.getX() - flowDirection) ? this.getX() - flowDirection
                 : this.getX();
         board[this.getY()][this.getX()] = null;
         changeColor(board);
@@ -34,6 +40,7 @@ public class WaterMaterial extends DynamicMaterial {
                     setX(nextX);
                 } else {
                     setY(i - 1);
+                    this.flowDirection = -flowDirection;
                 }
                 board[this.getY()][this.getX()] = this;
                 return;
@@ -42,9 +49,11 @@ public class WaterMaterial extends DynamicMaterial {
         setY(nextY);
         if (board[this.getY()][nextX] == null && this.getY() == this.getYLimit()) {
             setX(nextX);
+            this.flowDirection = -flowDirection;
         }
         board[this.getY()][this.getX()] = this;
     }
+
     private void changeColor(Material[][] board) {
         if (board[Math.max(this.getY() - 1, 0)][this.getX()] instanceof WaterMaterial waterMaterial) {
             Color colorAbove = waterMaterial.getColor();
