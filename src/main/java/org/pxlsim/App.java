@@ -4,7 +4,13 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.scene.Scene;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.TilePane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -33,9 +39,11 @@ import java.util.Set;
  * </table>
  */
 public class App extends Application {
+    private final String VERSION = "V.0.20"; // <- V.[Major Release].[Major Addition][Change in the current Addition]
     private final int WIDTH = 256;
     private final int HEIGHT = 144;
-    private final Display DISPLAY = new Display(WIDTH, HEIGHT, 60, 6);
+    private final int ZOOM = 6;
+    private Display display;
     private final Set<Material> MATERIALS = new HashSet<>();
     private final Set<DynamicMaterial> DYNAMIC_MATERIALS = new HashSet<>();
     private final Material[][] BOARD = new Material[HEIGHT][WIDTH];
@@ -46,11 +54,68 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        new MaterialCreator(DISPLAY, BOARD, MATERIALS, DYNAMIC_MATERIALS);
+        menu(stage);
+    }
+
+    //TODO: refactor this whole menu and Display thing because its horrible
+    private void menu(Stage stage) {
         stage.setResizable(false);
         stage.centerOnScreen();
-        stage.setScene(DISPLAY.getScene());
-        stage.setTitle("Pixel Simulator - V.0.16");
+        TilePane root = new TilePane();
+        Button startButton = new Button("Start");
+        Button defaultButton = new Button("Default");
+        TextField width = new TextField(String.valueOf(this.WIDTH));
+        width.textProperty().addListener(getNumberListener(width));
+        TextField height = new TextField(String.valueOf(this.HEIGHT));
+        height.textProperty().addListener(getNumberListener(height));
+        TextField zoom = new TextField(String.valueOf(this.ZOOM));
+        zoom.textProperty().addListener(getNumberListener(zoom));
+        root.getChildren().add(startButton);
+        root.getChildren().add(new Label("Window Width"));
+        root.getChildren().add(width);
+        root.getChildren().add(new Label("Window Height"));
+        root.getChildren().add(height);
+        root.getChildren().add(new Label("Scale of the Pixels"));
+        root.getChildren().add(zoom);
+        root.getChildren().add(defaultButton);
+        startButton.setOnAction(actionEvent -> {
+            stage.hide();
+            int displayWidth = Integer.parseInt(width.getText());
+            int displayHeight = Integer.parseInt(height.getText());
+            int displayZoom = Integer.parseInt(zoom.getText());
+            startGame(stage, new Display(displayWidth, displayHeight, 60, displayZoom));
+        });
+        defaultButton.setOnAction(actionEvent -> {
+            width.setText(String.valueOf(this.WIDTH));
+            height.setText(String.valueOf(this.HEIGHT));
+            zoom.setText(String.valueOf(this.ZOOM));
+        });
+        Scene scene = new Scene(root, 256, 256);
+        stage.setScene(scene);
+        stage.setTitle("Menu - " + VERSION);
+        stage.show();
+    }
+
+    private ChangeListener<String> getNumberListener(TextField textField) {
+        return (observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                newValue = newValue.replaceAll("\\D", "");
+            }
+            if (newValue.isEmpty()) {
+                textField.setText(String.valueOf(1));
+            } else {
+                textField.setText(newValue);
+            }
+        };
+    }
+
+    private void startGame(Stage stage, Display gameDisplay) {
+        this.display = gameDisplay;
+        new MaterialCreator(display, BOARD, MATERIALS, DYNAMIC_MATERIALS);
+        stage.setResizable(false);
+        stage.centerOnScreen();
+        stage.setScene(display.getScene());
+        stage.setTitle("Pixel Simulator - " + VERSION);
         stage.show();
 /*
 TODO: fix not getting dedicated-fullscreen with this JavaFX code
@@ -61,7 +126,7 @@ TODO: fix not getting dedicated-fullscreen with this JavaFX code
         }
  */
         render();
-        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(DISPLAY.getRefreshRate().doubleValue()), e -> {
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(display.getRefreshRate().doubleValue()), e -> {
             if (!DYNAMIC_MATERIALS.isEmpty()) {
                 handleContent();
             }
@@ -78,16 +143,16 @@ TODO: fix not getting dedicated-fullscreen with this JavaFX code
     }
 
     private void render() {
-        GraphicsContext graphics = DISPLAY.getGraphics();
+        GraphicsContext graphics = display.getGraphics();
 //        graphics.clearRect(0, 0, DISPLAY.getWidth(), DISPLAY.getHeight());                     [Old-rendering method]
-        graphics.clearRect(0, 0, DISPLAY.getWindowWidth(), DISPLAY.getWindowHeight());
+        graphics.clearRect(0, 0, display.getWindowWidth(), display.getWindowHeight());
         graphics.setFill(Color.BLACK);
 //        graphics.fillRect(0, 0, DISPLAY.getWidth(), DISPLAY.getHeight());                      [Old-rendering method]
-        graphics.fillRect(0, 0, DISPLAY.getWindowWidth(), DISPLAY.getWindowHeight());
+        graphics.fillRect(0, 0, display.getWindowWidth(), display.getWindowHeight());
         for (Material mat : MATERIALS) {
-            double zoom = DISPLAY.getZoom().doubleValue();
-            double x = DISPLAY.getZoom().multiply(new BigDecimal(mat.getX())).doubleValue();
-            double y = DISPLAY.getZoom().multiply(new BigDecimal(mat.getY())).doubleValue();
+            double zoom = display.getZoom().doubleValue();
+            double x = display.getZoom().multiply(new BigDecimal(mat.getX())).doubleValue();
+            double y = display.getZoom().multiply(new BigDecimal(mat.getY())).doubleValue();
             graphics.setFill(mat.getColor());
             graphics.fillRect(x, y, zoom, zoom);
 //            graphics.getPixelWriter().setColor(mat.getX(), mat.getY(), mat.getColor());        [Old-rendering method]
