@@ -9,10 +9,12 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.TilePane;
 import javafx.scene.paint.Color;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.pxlsim.materials.DynamicMaterial;
@@ -40,10 +42,10 @@ import java.util.Set;
  * </table>
  */
 public class App extends Application {
-    private final String VERSION = "V.0.230"; // <- V.[Major Release].[Major Addition][Change in the current Addition][Fixes]
-    private final int WIDTH = 256;
-    private final int HEIGHT = 144;
-    private final int ZOOM = 6;
+    private final String VERSION = "V.0.300"; // <- V.[Major Release].[Major Addition][Change in the current Addition][Fixes]
+    private final int WIDTH = 128;
+    private final int HEIGHT = 72;
+    private final int ZOOM = 12;
     private Display display;
     private final Set<Material> MATERIALS = new HashSet<>();
     private final Set<DynamicMaterial> DYNAMIC_MATERIALS = new HashSet<>();
@@ -70,12 +72,14 @@ public class App extends Application {
         startButton.setScaleX(2);
         startButton.setScaleY(2);
         Button defaultButton = new Button("Default");
+        CheckBox enableFullscreen = new CheckBox("Fullscreen");
         TextField width = new TextField(String.valueOf(this.WIDTH));
         width.textProperty().addListener(getNumberListener(width));
         TextField height = new TextField(String.valueOf(this.HEIGHT));
         height.textProperty().addListener(getNumberListener(height));
         TextField zoom = new TextField(String.valueOf(this.ZOOM));
         zoom.textProperty().addListener(getNumberListener(zoom));
+        zoom.setStyle("-fx-opacity: 1;");
         root.getChildren().add(startButton);
         root.getChildren().add(new Label("Window Width"));
         root.getChildren().add(width);
@@ -83,10 +87,11 @@ public class App extends Application {
         root.getChildren().add(height);
         root.getChildren().add(new Label("Scale of the Pixels"));
         root.getChildren().add(zoom);
+        root.getChildren().add(enableFullscreen);
         root.getChildren().add(defaultButton);
         startButton.setOnAction(actionEvent -> {
             stage.hide();
-            int displayWidth = Integer.parseInt(width.getText());
+            int displayWidth = Integer.parseInt(width.getText()); // TODO: validate if size and zoom values are possible
             int displayHeight = Integer.parseInt(height.getText());
             int displayZoom = Integer.parseInt(zoom.getText());
             startGame(stage, new Display(displayWidth, displayHeight, 60, displayZoom));
@@ -96,6 +101,23 @@ public class App extends Application {
             height.setText(String.valueOf(this.HEIGHT));
             zoom.setText(String.valueOf(this.ZOOM));
         });
+        enableFullscreen.setOnAction(actionEvent -> {
+            zoom.setEditable(!zoom.isEditable());
+            zoom.setMouseTransparent(!zoom.isMouseTransparent());
+            zoom.setFocusTraversable(!zoom.isFocusTraversable());
+            if (zoom.getStyle().equals("-fx-opacity: 1;")) {
+                zoom.setStyle("-fx-opacity: 0.5;");
+            } else {
+                zoom.setStyle("-fx-opacity: 1;");
+            }
+            int widthZoom = BigDecimal.valueOf(Screen.getPrimary().getBounds().getWidth() / Integer.parseInt(width.getText()))
+                    .intValue();
+            // use double with: .setScale(1, RoundingMode.HALF_EVEN).doubleValue();
+            int heightZoom = BigDecimal.valueOf(Screen.getPrimary().getBounds().getHeight() / Integer.parseInt(height.getText()))
+                    .intValue();
+            // use double with: .setScale(1, RoundingMode.HALF_EVEN).doubleValue();
+            zoom.setText(String.valueOf(Math.max(widthZoom, heightZoom)));
+        });
         Scene scene = new Scene(root, 256, 384);
         stage.setScene(scene);
         stage.setTitle("Menu - " + VERSION);
@@ -104,8 +126,8 @@ public class App extends Application {
 
     private ChangeListener<String> getNumberListener(TextField textField) {
         return (observable, oldValue, newValue) -> {
-            if (!newValue.matches("\\d*")) {
-                newValue = newValue.replaceAll("\\D", "");
+            if (!newValue.matches("\\d*")) {  // regex for decimal filtering: ^[0-9]*\.?[0-9]+$
+                newValue = newValue.replaceAll("\\D", ""); // TODO: only allow decimals
             }
             if (newValue.isEmpty()) {
                 textField.setText(String.valueOf(1));
@@ -123,14 +145,11 @@ public class App extends Application {
         stage.setScene(display.getScene());
         stage.setTitle("Pixel Simulator - " + VERSION);
         stage.show();
-/*
-TODO: fix not getting dedicated-fullscreen with this JavaFX code
-
-        if (Screen.getPrimary().getOutputScaleX() == DISPLAY.getWindowWidth()
-                && Screen.getPrimary().getOutputScaleY() == DISPLAY.getWindowHeight()) {
+        if (Screen.getPrimary().getBounds().getWidth() == display.getWindowWidth()
+                || Screen.getPrimary().getBounds().getHeight() == display.getWindowHeight()) {
             stage.setFullScreen(true);
+            // TODO: stop app when exiting fullscreen
         }
- */
         render();
         Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(display.getRefreshRate().doubleValue()), e -> {
             if (!DYNAMIC_MATERIALS.isEmpty()) {
