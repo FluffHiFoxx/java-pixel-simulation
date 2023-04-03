@@ -63,14 +63,24 @@ public class WaterMaterial extends DynamicMaterial {
     }
 
     private void changeColor(Material[][] board) {
-        if (board[Math.max(this.getY() - 1, 0)][this.getX()] instanceof WaterMaterial waterMaterial) {
+        Material waterLeft = isInBoundsX(this.getX() - 1) ? board[this.getY()][this.getX() - 1] : null;
+        Material waterRight = isInBoundsX(this.getX() + 1) ? board[this.getY()][this.getX() + 1] : null;
+        if (board[Math.max(this.getY() - 1, 0)][this.getX()] == null && !this.getColor().equals(Color.DEEPSKYBLUE)) {
+            this.setColor(Color.DEEPSKYBLUE);
+        } else if (board[Math.max(this.getY() - 1, 0)][this.getX()] instanceof WaterMaterial waterMaterial) {
             Color colorAbove = waterMaterial.getColor();
             double r = colorAbove.getRed() - 0.1 >= 0 ? colorAbove.getRed() - 0.1 : 0;
             double g = colorAbove.getGreen() - 0.1 >= 0 ? colorAbove.getGreen() - 0.1 : 0;
             double b = colorAbove.getGreen() == 0 && colorAbove.getRed() == 0 && colorAbove.getBlue() > 0.4 ? colorAbove.getBlue() - 0.1 : colorAbove.getBlue();
             this.setColor(Color.color(r, g, b));
-        } else if (!this.getColor().equals(Color.DEEPSKYBLUE)) {
-            this.setColor(Color.DEEPSKYBLUE);
+        } else if (waterLeft != null || waterRight != null) {
+            double left = waterLeft != null ? waterLeft.getColor().getGreen() : 1;
+            double right = waterRight != null ? waterRight.getColor().getGreen() : 1;
+            if (Math.min(left, right) == left && waterLeft instanceof WaterMaterial) {
+                this.setColor(waterLeft.getColor());
+            } else if (waterRight instanceof WaterMaterial) {
+                this.setColor(waterRight.getColor());
+            }
         }
     }
 }
