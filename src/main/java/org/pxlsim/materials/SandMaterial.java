@@ -20,12 +20,16 @@ public class SandMaterial extends DynamicMaterial {
     }
 
     @Override
+    public void handle(Material[][] board) {
+        move(board);
+    }
     public void move(Material[][] board) {
         int nextY = this.getY() + Math.min(this.getYLimit() - this.getY(), this.FALL_SPEED);
         int xModifier = new Random().nextBoolean() ? 1 : -1;
-        int nextX = isInBoundsX(this.getX() + xModifier) ? this.getX() + xModifier
-                : isInBoundsX(this.getX() - xModifier) ? this.getX() - xModifier
-                : this.getX();
+        int nextX = this.getX();
+        if (isInBoundsX(this.getX() + xModifier)) {
+            nextX += xModifier;
+        }
         board[this.getY()][this.getX()] = null;
         for (int i = this.getY(); i <= nextY; i++) {
             if (board[i][this.getX()] != null) {

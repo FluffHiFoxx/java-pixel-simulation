@@ -40,7 +40,7 @@ import java.util.Set;
  * </table>
  */
 public class App extends Application {
-    private final String VERSION = "V.0.22"; // <- V.[Major Release].[Major Addition][Change in the current Addition]
+    private final String VERSION = "V.0.221"; // <- V.[Major Release].[Major Addition][Change in the current Addition][Fixes]
     private final int WIDTH = 256;
     private final int HEIGHT = 144;
     private final int ZOOM = 6;
@@ -136,7 +136,9 @@ TODO: fix not getting dedicated-fullscreen with this JavaFX code
             if (!DYNAMIC_MATERIALS.isEmpty()) {
                 handleContent();
             }
-            render();
+            if (stage.isFocused()) {
+                render();
+            }
         }));
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.playFromStart();
@@ -144,7 +146,7 @@ TODO: fix not getting dedicated-fullscreen with this JavaFX code
 
     private void handleContent() {
         for (DynamicMaterial mat : DYNAMIC_MATERIALS) {
-            mat.move(BOARD);
+            mat.handle(BOARD);
         }
     }
 

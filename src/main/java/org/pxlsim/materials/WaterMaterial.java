@@ -18,6 +18,11 @@ public class WaterMaterial extends DynamicMaterial {
     }
 
     @Override
+    public void handle(Material[][] board) {
+        changeColor(board);
+        move(board);
+    }
+
     public void move(Material[][] board) {
 /* // [Old Liquid flow] - TO GO BACK TO THIS METHOD REMOVE FLOW DIRECTION
         int xModifier = new Random().nextBoolean() ? 1 : -1;
@@ -25,11 +30,13 @@ public class WaterMaterial extends DynamicMaterial {
                 : isInBoundsX(this.getX() - xModifier) ? this.getX() - xModifier
 */
         int nextY = this.getY() + Math.min(this.getYLimit() - this.getY(), this.FALL_SPEED);
-        int nextX = isInBoundsX(this.getX() + flowDirection) ? this.getX() + flowDirection
-                : isInBoundsX(this.getX() - flowDirection) ? this.getX() - flowDirection
-                : this.getX();
+        int nextX = this.getX();
+        if (isInBoundsX(this.getX() + flowDirection)) {
+            nextX += flowDirection;
+        } else {
+            this.flowDirection = -flowDirection;
+        }
         board[this.getY()][this.getX()] = null;
-        changeColor(board);
         for (int i = this.getY(); i <= nextY; i++) {
             if (board[i][this.getX()] != null) {
                 if (board[i][nextX] == null
@@ -49,6 +56,7 @@ public class WaterMaterial extends DynamicMaterial {
         setY(nextY);
         if (board[this.getY()][nextX] == null && this.getY() == this.getYLimit()) {
             setX(nextX);
+        } else if (this.getY() == this.getYLimit()) {
             this.flowDirection = -flowDirection;
         }
         board[this.getY()][this.getX()] = this;

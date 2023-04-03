@@ -15,7 +15,7 @@ public abstract class DynamicMaterial extends Material {
         this.FALL_SPEED = this.REFRESH_RATE.multiply(new BigDecimal(Math.round(Math.pow(9.81, 2)))).intValue();
     }
 
-    public abstract void move(Material[][] board);
+    public abstract void handle(Material[][] board);
     public boolean isInBoundsX(int value) {
         return value >= 0 && value <= this.getXLimit();
     }
