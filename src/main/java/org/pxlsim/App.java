@@ -42,7 +42,7 @@ import java.util.Set;
  * </table>
  */
 public class App extends Application {
-    private final String VERSION = "V.0.310"; // <- V.[Major Release].[Major Addition][Change in the current Addition][Fixes]
+    private final String VERSION = "V.0.320"; // <- V.[Major Release].[Major Addition][Change in the current Addition][Fixes]
     private final int WIDTH = 128;
     private final int HEIGHT = 72;
     private final int ZOOM = 12;
@@ -134,6 +134,9 @@ public class App extends Application {
         return (observable, oldValue, newValue) -> {
             int max = (int) getMaxZoom(Double.parseDouble(width.getText()), Double.parseDouble(height.getText()));
             if (Integer.parseInt(zoom.getText()) > max) {
+                zoom.setText(String.valueOf(max));
+            }
+            if (!zoom.isEditable()) {
                 zoom.setText(String.valueOf(max));
             }
         };
