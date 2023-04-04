@@ -71,6 +71,7 @@ public class MaterialCreator {
                         }
                         case 1 -> new SandMaterial(DISPLAY, x, y);
                         case 2 -> new WaterMaterial(DISPLAY, x, y);
+                        case 3 -> new GasMaterial(DISPLAY, x, y);
                         default -> throw new IllegalStateException("Unexpected value: " + materialIndex);
                     };
                     if (material instanceof DynamicMaterial) {
@@ -112,6 +113,7 @@ public class MaterialCreator {
                 case "1" -> materialIndex = 0;
                 case "2" -> materialIndex = 1;
                 case "3" -> materialIndex = 2;
+                case "4" -> materialIndex = 3;
             }
         };
     }
