@@ -21,6 +21,7 @@ import org.pxlsim.materials.DynamicMaterial;
 import org.pxlsim.materials.Material;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -42,7 +43,7 @@ import java.util.Set;
  * </table>
  */
 public class App extends Application {
-    private final String VERSION = "V.0.320"; // <- V.[Major Release].[Major Addition][Change in the current Addition][Fixes]
+    private final String VERSION = "V.0.330"; // <- V.[Major Release].[Major Addition][Change in the current Addition][Fixes]
     private final int WIDTH = 128;
     private final int HEIGHT = 72;
     private final int ZOOM = 12;
@@ -98,7 +99,7 @@ public class App extends Application {
             stage.hide();
             int displayWidth = Integer.parseInt(width.getText());
             int displayHeight = Integer.parseInt(height.getText());
-            int displayZoom = Integer.parseInt(zoom.getText());
+            double displayZoom = Double.parseDouble(zoom.getText());
             this.board = new Material[displayHeight][displayWidth];
             startGame(stage, new Display(displayWidth, displayHeight, 60, displayZoom));
         });
@@ -132,8 +133,11 @@ public class App extends Application {
 
     private ChangeListener<String> limitZoom(TextField zoom, TextField width, TextField height) {
         return (observable, oldValue, newValue) -> {
-            int max = (int) getMaxZoom(Double.parseDouble(width.getText()), Double.parseDouble(height.getText()));
-            if (Integer.parseInt(zoom.getText()) > max) {
+            double max = BigDecimal
+                    .valueOf(getMaxZoom(Double.parseDouble(width.getText()), Double.parseDouble(height.getText())))
+                    .setScale(1, RoundingMode.HALF_EVEN)
+                    .doubleValue();
+            if (Double.parseDouble(zoom.getText()) > max) {
                 zoom.setText(String.valueOf(max));
             }
             if (!zoom.isEditable()) {
@@ -146,15 +150,22 @@ public class App extends Application {
         return Math.min(SCREEN_WIDTH / width, SCREEN_HEIGHT / height);
     }
 
-    private ChangeListener<String> getNumberListener(TextField textField, int limit) {
+    private ChangeListener<String> getNumberListener(TextField textField, double limit) {
         return (observable, oldValue, newValue) -> {
             if (newValue.isEmpty()) {
                 newValue = String.valueOf(1);
             }
-            if (!newValue.matches("\\d*")) {  // regex for decimal filtering: ^[0-9]*\.?[0-9]+$
-                newValue = newValue.replaceAll("\\D", ""); // TODO: only allow decimals
+            if (!newValue.matches("^[0-9]*\\.?[0-9]+$")) {
+                if (newValue.contains(".")) {
+                    int dotIndex = newValue.indexOf('.');
+                    String newValue1 = newValue.substring(0, dotIndex).replaceAll("\\D", "");
+                    String newValue2 = newValue.substring(dotIndex + 1).replaceAll("\\D", "");
+                    newValue = newValue1 + "." + newValue2;
+                } else {
+                    newValue = newValue.replaceAll("\\D", "");
+                }
             }
-            if (Integer.parseInt(newValue) >= limit && limit > 0) {
+            if (Double.parseDouble(newValue) >= limit && limit > 0) {
                 newValue = String.valueOf(limit);
             }
             textField.setText(newValue);
@@ -169,8 +180,7 @@ public class App extends Application {
         stage.setScene(display.getScene());
         stage.setTitle("Pixel Simulator - " + VERSION);
         stage.show();
-        if (Screen.getPrimary().getBounds().getWidth() == display.getWindowWidth()
-                || Screen.getPrimary().getBounds().getHeight() == display.getWindowHeight()) {
+        if (SCREEN_WIDTH == display.getWindowWidth() || SCREEN_HEIGHT == display.getWindowHeight()) {
             stage.setFullScreen(true);
             // TODO: stop app when exiting fullscreen
         }
