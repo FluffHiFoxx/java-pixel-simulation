@@ -19,8 +19,8 @@ public class WaterMaterial extends DynamicMaterial {
 
     @Override
     public void handle(Material[][] board) {
-        changeColor(board);
         move(board);
+        changeColor(board);
     }
 
     public void move(Material[][] board) {
