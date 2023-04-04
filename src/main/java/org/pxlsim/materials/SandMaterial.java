@@ -35,17 +35,19 @@ public class SandMaterial extends DynamicMaterial {
             if (board[i][this.getX()] != null) {
                 if (board[i][nextX] == null
                         && board[this.getY()][nextX] == null) {
-                    if (board[i][nextX] instanceof WaterMaterial water) {
-                        water.setY(i + 1);
-                        board[water.getY()][water.getX()] = water;
+                    if (board[i][nextX] instanceof WaterMaterial || board[i][nextX] instanceof GasMaterial) {
+                        DynamicMaterial lesser = (DynamicMaterial) board[i][nextX];
+                        lesser.setY(i + 1);
+                        board[lesser.getY()][lesser.getX()] = lesser;
                     }
                     setY(i);
                     setX(nextX);
                 } else {
-                    if (board[i][this.getX()] instanceof WaterMaterial water) {
-                        water.setY(i - 1);
+                    if (board[i][this.getX()] instanceof WaterMaterial || board[i][this.getX()] instanceof GasMaterial) {
+                        DynamicMaterial lesser = (DynamicMaterial) board[i][this.getX()];
+                        lesser.setY(i - 1);
                         setY(i);
-                        board[water.getY()][water.getX()] = water;
+                        board[lesser.getY()][lesser.getX()] = lesser;
                     } else {
                         setY(i - 1);
                     }

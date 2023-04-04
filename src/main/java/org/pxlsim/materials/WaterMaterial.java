@@ -41,13 +41,27 @@ public class WaterMaterial extends DynamicMaterial {
             if (board[i][this.getX()] != null) {
                 if (board[i][nextX] == null
                         && board[this.getY()][nextX] == null) {
+                    if (board[i][nextX] instanceof GasMaterial lesser) {
+                        lesser.setY(i + 1);
+                        board[lesser.getY()][lesser.getX()] = lesser;
+                    }
                     setY(i);
                     setX(nextX);
                 } else if (board[this.getY()][nextX] == null) {
+                    if (board[this.getY()][nextX] instanceof GasMaterial lesser) {
+                        lesser.setY(this.getY() + 1);
+                        board[lesser.getY()][lesser.getX()] = lesser;
+                    }
                     setX(nextX);
                 } else {
-                    setY(i - 1);
-                    this.flowDirection = -flowDirection;
+                    if (board[i][this.getX()] instanceof GasMaterial lesser) {
+                        lesser.setY(i + 1);
+                        setY(i);
+                        board[lesser.getY()][lesser.getX()] = lesser;
+                    } else {
+                        setY(i - 1);
+                        this.flowDirection = -flowDirection;
+                    }
                 }
                 board[this.getY()][this.getX()] = this;
                 return;
