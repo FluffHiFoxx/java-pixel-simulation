@@ -42,14 +42,16 @@ import java.util.Set;
  * </table>
  */
 public class App extends Application {
-    private final String VERSION = "V.0.300"; // <- V.[Major Release].[Major Addition][Change in the current Addition][Fixes]
+    private final String VERSION = "V.0.310"; // <- V.[Major Release].[Major Addition][Change in the current Addition][Fixes]
     private final int WIDTH = 128;
     private final int HEIGHT = 72;
     private final int ZOOM = 12;
     private Display display;
     private final Set<Material> MATERIALS = new HashSet<>();
     private final Set<DynamicMaterial> DYNAMIC_MATERIALS = new HashSet<>();
-    private final Material[][] BOARD = new Material[HEIGHT][WIDTH];
+    private Material[][] board;
+    private final double SCREEN_WIDTH = Screen.getPrimary().getBounds().getWidth();
+    private final double SCREEN_HEIGHT = Screen.getPrimary().getBounds().getHeight();
 
     public static void main(String[] args) {
         launch(args);
@@ -74,11 +76,14 @@ public class App extends Application {
         Button defaultButton = new Button("Default");
         CheckBox enableFullscreen = new CheckBox("Fullscreen");
         TextField width = new TextField(String.valueOf(this.WIDTH));
-        width.textProperty().addListener(getNumberListener(width));
+        width.textProperty().addListener(getNumberListener(width, (int) SCREEN_WIDTH));
         TextField height = new TextField(String.valueOf(this.HEIGHT));
-        height.textProperty().addListener(getNumberListener(height));
+        height.textProperty().addListener(getNumberListener(height, (int) SCREEN_HEIGHT));
         TextField zoom = new TextField(String.valueOf(this.ZOOM));
-        zoom.textProperty().addListener(getNumberListener(zoom));
+        zoom.textProperty().addListener(getNumberListener(zoom, 0));
+        zoom.textProperty().addListener(limitZoom(zoom, width, height));
+        width.textProperty().addListener(limitZoom(zoom, width, height));
+        height.textProperty().addListener(limitZoom(zoom, width, height));
         zoom.setStyle("-fx-opacity: 1;");
         root.getChildren().add(startButton);
         root.getChildren().add(new Label("Window Width"));
@@ -91,9 +96,10 @@ public class App extends Application {
         root.getChildren().add(defaultButton);
         startButton.setOnAction(actionEvent -> {
             stage.hide();
-            int displayWidth = Integer.parseInt(width.getText()); // TODO: validate if size and zoom values are possible
+            int displayWidth = Integer.parseInt(width.getText());
             int displayHeight = Integer.parseInt(height.getText());
             int displayZoom = Integer.parseInt(zoom.getText());
+            this.board = new Material[displayHeight][displayWidth];
             startGame(stage, new Display(displayWidth, displayHeight, 60, displayZoom));
         });
         defaultButton.setOnAction(actionEvent -> {
@@ -110,10 +116,10 @@ public class App extends Application {
             } else {
                 zoom.setStyle("-fx-opacity: 1;");
             }
-            int widthZoom = BigDecimal.valueOf(Screen.getPrimary().getBounds().getWidth() / Integer.parseInt(width.getText()))
+            int widthZoom = BigDecimal.valueOf(SCREEN_WIDTH / Integer.parseInt(width.getText()))
                     .intValue();
             // use double with: .setScale(1, RoundingMode.HALF_EVEN).doubleValue();
-            int heightZoom = BigDecimal.valueOf(Screen.getPrimary().getBounds().getHeight() / Integer.parseInt(height.getText()))
+            int heightZoom = BigDecimal.valueOf(SCREEN_HEIGHT / Integer.parseInt(height.getText()))
                     .intValue();
             // use double with: .setScale(1, RoundingMode.HALF_EVEN).doubleValue();
             zoom.setText(String.valueOf(Math.max(widthZoom, heightZoom)));
@@ -124,22 +130,37 @@ public class App extends Application {
         stage.show();
     }
 
-    private ChangeListener<String> getNumberListener(TextField textField) {
+    private ChangeListener<String> limitZoom(TextField zoom, TextField width, TextField height) {
         return (observable, oldValue, newValue) -> {
+            int max = (int) getMaxZoom(Double.parseDouble(width.getText()), Double.parseDouble(height.getText()));
+            if (Integer.parseInt(zoom.getText()) > max) {
+                zoom.setText(String.valueOf(max));
+            }
+        };
+    }
+
+    private double getMaxZoom(double width, double height) {
+        return Math.min(SCREEN_WIDTH / width, SCREEN_HEIGHT / height);
+    }
+
+    private ChangeListener<String> getNumberListener(TextField textField, int limit) {
+        return (observable, oldValue, newValue) -> {
+            if (newValue.isEmpty()) {
+                newValue = String.valueOf(1);
+            }
             if (!newValue.matches("\\d*")) {  // regex for decimal filtering: ^[0-9]*\.?[0-9]+$
                 newValue = newValue.replaceAll("\\D", ""); // TODO: only allow decimals
             }
-            if (newValue.isEmpty()) {
-                textField.setText(String.valueOf(1));
-            } else {
-                textField.setText(newValue);
+            if (Integer.parseInt(newValue) >= limit && limit > 0) {
+                newValue = String.valueOf(limit);
             }
+            textField.setText(newValue);
         };
     }
 
     private void startGame(Stage stage, Display gameDisplay) {
         this.display = gameDisplay;
-        new MaterialCreator(display, BOARD, MATERIALS, DYNAMIC_MATERIALS);
+        new MaterialCreator(display, board, MATERIALS, DYNAMIC_MATERIALS);
         stage.setResizable(false);
         stage.centerOnScreen();
         stage.setScene(display.getScene());
@@ -165,7 +186,7 @@ public class App extends Application {
 
     private void handleContent() {
         for (DynamicMaterial mat : DYNAMIC_MATERIALS) {
-            mat.handle(BOARD);
+            mat.handle(board);
         }
     }
 
