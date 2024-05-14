@@ -7,9 +7,13 @@ import javafx.event.EventHandler;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Color;
 import javafx.util.Duration;
-import org.pxlsim.materials.*;
+import org.pxlsim.model.materials.Material;
+import org.pxlsim.model.materials.Platform;
+import org.pxlsim.model.materials.dynamic.DynamicMaterial;
+import org.pxlsim.model.materials.dynamic.GasMaterial;
+import org.pxlsim.model.materials.dynamic.SandMaterial;
+import org.pxlsim.model.materials.dynamic.WaterMaterial;
 
 import java.util.Set;
 
@@ -65,8 +69,8 @@ public class MaterialCreator {
                 if (button.equals(MouseButton.PRIMARY)) {
                     Material material = switch (materialIndex) {
                         case 0 -> {
-                            Platform platform = new Platform(DISPLAY, x, y, Color.GRAY);
-                            BOARD[platform.getY()][platform.getX()] = platform;
+                            Platform platform = new Platform(DISPLAY, x, y);
+                            BOARD[platform.getPosition().getY()][platform.getPosition().getX()] = platform;
                             yield platform;
                         }
                         case 1 -> new SandMaterial(DISPLAY, x, y);

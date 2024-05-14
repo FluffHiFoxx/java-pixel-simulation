@@ -1,5 +1,6 @@
 package org.pxlsim;
 
+
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -17,8 +18,9 @@ import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import org.pxlsim.materials.DynamicMaterial;
-import org.pxlsim.materials.Material;
+import org.pxlsim.handler.MaterialHandlerManager;
+import org.pxlsim.model.materials.Material;
+import org.pxlsim.model.materials.dynamic.DynamicMaterial;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -27,7 +29,7 @@ import java.util.Set;
 
 /**
  * <h1>Screen size cheat sheet</h1>
- * <h2>16:9</h2>
+ * <h2>Using aspect ratio of 16:9</h2>
  * <table>
  *     <thead>
  *          <tr><th>WIDTH</th><th>HEIGHT</th><th>Zoom to 1920x1080</th><th>Recommended Zoom</th><th>Problems</th></tr>
@@ -43,23 +45,24 @@ import java.util.Set;
  * </table>
  */
 public class App extends Application {
-    private final String VERSION = "V.0.421"; // <- V.[Major Release].[Major Addition][Change in the current Addition][Fixes]
+    private final String VERSION = "V.0.42.2"; // <- V.[Major Release].[Major Addition][Minor Addition].[Fixes]
     private final int WIDTH = 128;
     private final int HEIGHT = 72;
     private final int ZOOM = 12;
-    private Display display;
     private final Set<Material> MATERIALS = new HashSet<>();
     private final Set<DynamicMaterial> DYNAMIC_MATERIALS = new HashSet<>();
-    private Material[][] board;
     private final double SCREEN_WIDTH = Screen.getPrimary().getBounds().getWidth();
     private final double SCREEN_HEIGHT = Screen.getPrimary().getBounds().getHeight();
+    private final MaterialHandlerManager materialHandlerManager = new MaterialHandlerManager();
+    private Display display;
+    private Material[][] board;
 
     public static void main(String[] args) {
         launch(args);
     }
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage) {
         menu(stage);
     }
 
@@ -112,17 +115,19 @@ public class App extends Application {
             zoom.setEditable(!zoom.isEditable());
             zoom.setMouseTransparent(!zoom.isMouseTransparent());
             zoom.setFocusTraversable(!zoom.isFocusTraversable());
+
             if (zoom.getStyle().equals("-fx-opacity: 1;")) {
                 zoom.setStyle("-fx-opacity: 0.5;");
             } else {
                 zoom.setStyle("-fx-opacity: 1;");
             }
+
             int widthZoom = BigDecimal.valueOf(SCREEN_WIDTH / Integer.parseInt(width.getText()))
                     .intValue();
-            // use double with: .setScale(1, RoundingMode.HALF_EVEN).doubleValue();
+
             int heightZoom = BigDecimal.valueOf(SCREEN_HEIGHT / Integer.parseInt(height.getText()))
                     .intValue();
-            // use double with: .setScale(1, RoundingMode.HALF_EVEN).doubleValue();
+
             zoom.setText(String.valueOf(Math.max(widthZoom, heightZoom)));
         });
         Scene scene = new Scene(root, 256, 384);
@@ -178,6 +183,7 @@ public class App extends Application {
         stage.setResizable(false);
         stage.centerOnScreen();
         stage.setScene(display.getScene());
+        stage.sizeToScene();
         stage.setTitle("Pixel Simulator - " + VERSION);
         stage.show();
         if (SCREEN_WIDTH == display.getWindowWidth() || SCREEN_HEIGHT == display.getWindowHeight()) {
@@ -198,25 +204,22 @@ public class App extends Application {
     }
 
     private void handleContent() {
-        for (DynamicMaterial mat : DYNAMIC_MATERIALS) {
-            mat.handle(board);
+        for (DynamicMaterial material : DYNAMIC_MATERIALS) {
+            materialHandlerManager.handle(board, material);
         }
     }
 
     private void render() {
         GraphicsContext graphics = display.getGraphics();
-//        graphics.clearRect(0, 0, DISPLAY.getWidth(), DISPLAY.getHeight());                     [Old-rendering method]
         graphics.clearRect(0, 0, display.getWindowWidth(), display.getWindowHeight());
         graphics.setFill(Color.BLACK);
-//        graphics.fillRect(0, 0, DISPLAY.getWidth(), DISPLAY.getHeight());                      [Old-rendering method]
         graphics.fillRect(0, 0, display.getWindowWidth(), display.getWindowHeight());
-        for (Material mat : MATERIALS) {
+        for (Material material : MATERIALS) {
             double zoom = display.getZoom().doubleValue();
-            double x = display.getZoom().multiply(new BigDecimal(mat.getX())).doubleValue();
-            double y = display.getZoom().multiply(new BigDecimal(mat.getY())).doubleValue();
-            graphics.setFill(mat.getColor());
+            double x = display.getZoom().multiply(new BigDecimal(material.getPosition().getX())).doubleValue();
+            double y = display.getZoom().multiply(new BigDecimal(material.getPosition().getY())).doubleValue();
+            graphics.setFill(material.getColor());
             graphics.fillRect(x, y, zoom, zoom);
-//            graphics.getPixelWriter().setColor(mat.getX(), mat.getY(), mat.getColor());        [Old-rendering method]
         }
     }
 }
