@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 
 @Getter
 public class Display {
+
     private final int width;
     private final int height;
     private final BigDecimal refreshRate;

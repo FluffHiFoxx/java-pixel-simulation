@@ -16,6 +16,7 @@
         <javafx.version>21.0.3</javafx.version>
         <javafx.maven.plugin.version>0.0.6</javafx.maven.plugin.version>
         <project.lombok>1.18.32</project.lombok>
+        <slf4j>2.0.13</slf4j>
     </properties>
 
     <dependencies>
@@ -34,6 +35,11 @@
             <artifactId>lombok</artifactId>
             <version>${project.lombok}</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>log4j-over-slf4j</artifactId>
+            <version>${slf4j}</version>
         </dependency>
     </dependencies>
 
